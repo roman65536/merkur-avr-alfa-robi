@@ -1,4 +1,10 @@
-﻿#define F_CPU 1000000UL
+﻿/*
+Modified Version 
+R. Pollak 2013
+*/
+
+
+#define F_CPU 1000000UL
 
 #include <stdint.h> 
 #include <stdbool.h> 
@@ -25,6 +31,13 @@
 
 
 
+
+
+/*
+This is software PWM for n Channels
+found it on mikrokontroller.net
+NOTE: when ever you change the pwm_value call pwm_update() 
+*/
 
 
 
@@ -502,6 +515,13 @@ ISR(TIMER2_OVF_vect)
 }
 
 
+
+/*
+Since there are very limited possibilities to communicate with the user 
+this comes very handy. It beeps using Motor as loudspeaker. :)
+the time is the Period time of the beep, so 1000 should generate a 1khz sound
+*/
+
 void beep(int time)
 {
 int a;
@@ -515,6 +535,13 @@ int a;
  }
 }
 
+/*
+set the speed of the motors
+valid values are -255 to 255 
+where -255 is maximum backward
+0 stops
+255 maximum forward 
+*/
 
 void set_motor(int left, int right)
 {
