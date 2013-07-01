@@ -1,0 +1,15 @@
+
+2013 Roman Pollak 
+
+
+This is an alternative Firmware for the Merkur AVR Alfa.
+Since I was not happy with the one that comes with the product,
+I add some new features, which are prety handy. 
+Now for example, the speed of both motors can be controled in both direction.
+The firmware as it is works as an example. When press forward, the software
+incrise the speed for both motors slowly. By pressing backward, it decrement the speed,
+until it drives back. By pressing Func. B it stops rightway.
+
+
+
+
