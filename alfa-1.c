@@ -1,10 +1,4 @@
-﻿/*
-Modified Version 
-R. Pollak 2013
-*/
-
-
-#define F_CPU 1000000UL
+﻿#define F_CPU 1000000UL
 
 #include <stdint.h> 
 #include <stdbool.h> 
@@ -31,13 +25,6 @@ R. Pollak 2013
 
 
 
-
-
-/*
-This is software PWM for n Channels
-found it on mikrokontroller.net
-NOTE: when ever you change the pwm_value call pwm_update() 
-*/
 
 
 
@@ -182,7 +169,7 @@ void beep(int time);
 int main(void) 
 { 	
   uint8_t i;
-  int t=0;
+  int16_t s_l=0,s_r=0;
 
 // PWM initialisieren
   for( i=0; i<CHANNELS; i++)
@@ -226,23 +213,32 @@ int main(void)
 
 	      cmd=PINC & 0x0f;
 	      if(cmd == 0xe)
-		if (t > -255) t--;
-	      {
-		set_motor(t,t);
-	      }
+		{
+		if (s_l > -255) s_l--;
+		if (s_r > -255) s_r--;
+		set_motor(s_l,s_r);
+ 	        }
 	      if(cmd == 0xd)
 		{
-		  if ( t < 255) t++;
-		  {
-		set_motor(t,t);
-		  }
+		  if (s_l < 255) s_l++;
+		  if (s_r < 255) s_r++;
+		set_motor(s_l,s_r);
+		  
+		}
+	      if(cmd == 0xb)
+		{
+		  if (s_l > -255) s_l--;
+		  if (s_r < 255) s_r++;
+		set_motor(s_l,s_r);
 		}
 	      if(cmd == 0x7)
-		set_motor(-128,128);
-	      if(cmd == 0xb)
-		set_motor(128,-128);
+		{
+		  if (s_r > -255) s_r--;
+		  if (s_l < 255) s_l++;
+		  set_motor(s_l,s_r);
+		}
 	      if(cmd == 0x3)
-		{set_motor(0,0); t=0; }
+		{set_motor(0,0); s_l=s_r=0; }
 	      _delay_ms(100);
 	     
 	    }
@@ -515,13 +511,6 @@ ISR(TIMER2_OVF_vect)
 }
 
 
-
-/*
-Since there are very limited possibilities to communicate with the user 
-this comes very handy. It beeps using Motor as loudspeaker. :)
-the time is the Period time of the beep, so 1000 should generate a 1khz sound
-*/
-
 void beep(int time)
 {
 int a;
@@ -530,27 +519,23 @@ int a;
  {
   _delay_us(time/2);
   PORTD &= ~(1<<R_MOT_B);
+  PORTD |= (1<<R_MOT_F);
   _delay_us(time/2);
   PORTD |= (1<<R_MOT_B);
+  PORTD &= ~(1<<R_MOT_F);
  }
+ PORTD &= ~(1<<R_MOT_B |1<<R_MOT_F );
 }
 
-/*
-set the speed of the motors
-valid values are -255 to 255 
-where -255 is maximum backward
-0 stops
-255 maximum forward 
-*/
 
 void set_motor(int left, int right)
 {
-  if (left < 0)
+  if (right < 0)
     { pwm_value[0]=0; pwm_value[1]=-right; }
   else 
     { pwm_value[0]=right; pwm_value[1]=0; }
 
-if (right < 0)
+if (left < 0)
     { pwm_value[3]=0; pwm_value[2]=-left; }
   else 
     { pwm_value[3]=left; pwm_value[2]=0; }
